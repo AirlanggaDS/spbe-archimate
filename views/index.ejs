@@ -1,0 +1,48 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PlantUML ArchiMate Generator</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
+    pre { background: #222; color: #0f0; padding: 1em; overflow-x: auto; }
+    .result { margin-top: 2em; }
+    img.diagram { border: 1px solid #ccc; background: #fff; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Upload Excel Metadata (21 sheet)</h1>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xls,.xlsx" required />
+    <button type="submit">Generate Diagram</button>
+  </form>
+
+  <% if (umlCode) { %>
+    <div class="result">
+      <h2>Generated PlantUML Syntax:</h2>
+      <pre><%= umlCode %></pre>
+
+      <h2>Diagram:</h2>
+      <img class="diagram" src="https://www.plantuml.com/plantuml/svg/<%= encodedUml %>" alt="Diagram PlantUML" />
+    </div>
+  <% } %>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PlantUML ArchiMate Generator</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
+    form { background: white; padding: 2em; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Upload Excel Metadata (21 Sheet)</h1>
+  <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xls,.xlsx" required />
+    <button type="submit">Generate Diagram</button>
+  </form>
+</body>
+</html>

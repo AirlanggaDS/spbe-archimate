@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hasil Diagram ArchiMate</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
+    pre { background: #222; color: #0f0; padding: 1em; overflow-x: auto; }
+    .result { margin-top: 2em; }
+    img.diagram { border: 1px solid #ccc; background: #fff; padding: 10px; max-width: 100%; }
+    a.button { display: inline-block; margin-top: 1em; padding: 0.5em 1em; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
+    a.button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>Diagram ArchiMate dari Metadata SPBE</h1>
+
+  <div class="result">
+    <h2>Generated PlantUML Syntax:</h2>
+    <pre><%= umlCode %></pre>
+
+    <h2>Diagram:</h2>
+    <img class="diagram" src="https://www.plantuml.com/plantuml/svg/<%= encodedUml %>" alt="Diagram PlantUML" />
+
+    <a class="button" href="/">⬅ Kembali ke Upload</a>
+    <a class="button" href="https://www.plantuml.com/plantuml/png/<%= encodedUml %>" target="_blank">🖼 Download PNG</a>
+    <a class="button" href="https://www.plantuml.com/plantuml/svg/<%= encodedUml %>" target="_blank">🖼 Download SVG</a>
+  </div>
+</body>
+</html>
