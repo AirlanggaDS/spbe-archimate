@@ -1,48 +1,269 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>PlantUML ArchiMate Generator</title>
-  <style>
-    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
-    pre { background: #222; color: #0f0; padding: 1em; overflow-x: auto; }
-    .result { margin-top: 2em; }
-    img.diagram { border: 1px solid #ccc; background: #fff; padding: 10px; }
-  </style>
-</head>
-<body>
-  <h1>Upload Excel Metadata (21 sheet)</h1>
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".xls,.xlsx" required />
-    <button type="submit">Generate Diagram</button>
-  </form>
-
-  <% if (umlCode) { %>
-    <div class="result">
-      <h2>Generated PlantUML Syntax:</h2>
-      <pre><%= umlCode %></pre>
-
-      <h2>Diagram:</h2>
-      <img class="diagram" src="https://www.plantuml.com/plantuml/svg/<%= encodedUml %>" alt="Diagram PlantUML" />
-    </div>
-  <% } %>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>PlantUML ArchiMate Generator</title>
   <style>
-    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
-    form { background: white; padding: 2em; border-radius: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .left-panel,
+    .right-panel {
+      flex: 1;
+      padding: 2em;
+    }
+
+    .left-panel {
+      background-color: #ffffff;
+      border-right: 1px solid #ddd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .right-panel {
+      background-color: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2em;
+      /* kasih padding supaya gak mepet */
+      box-sizing: border-box;
+      min-width: 400px;
+      /* supaya tidak terlalu kecil */
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .form-box {
+      background: white;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 480px;
+      /* batasi lebar maksimal */
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+
+    button {
+      padding: 0.5em 1.5em;
+      background-color: #e79950;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #50bce7;
+    }
+
+    .info-box {
+      background: #f8f7f7;
+      padding: 1em;
+      border-radius: 8px;
+      text-align: justify;
+      margin-left: 20px;
+    }
+
+    .upload-area {
+      border: 3px dashed #ccc;
+      border-radius: 12px;
+      padding: 60px 20px;
+      text-align: center;
+      background-color: #fafafa;
+      cursor: pointer;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      margin-bottom: 25px;
+      user-select: none;
+      font-size: 1.2em;
+      color: #555;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 180px;
+      /* buat tinggi cukup besar */
+      box-sizing: border-box;
+    }
+
+    .upload-area.dragover {
+      background-color: #e6f4ff;
+      border-color: #3399ff;
+      color: #1a73e8;
+    }
+
+    /* Sembunyikan input file asli */
+    input[type="file"] {
+      display: none;
+    }
+
+    /* Tombol di bawah area upload */
+    .buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: space-between;
+    }
+
+    .buttons button {
+      flex: 1;
+      padding: 12px 0;
+      font-size: 1.1em;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background-color: #e79950;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    .buttons button:hover {
+      background-color: #50bce7;
+    }
+
+    /* Agar link wrapping tombol download tidak ngaruh */
+    .buttons a {
+      flex: 1;
+      text-decoration: none;
+    }
+
+    .buttons a button {
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-area .file-info {
+      display: block;
+      margin-top: 10px;
+      font-size: 1em;
+      font-weight: bold;
+      color: #28a745;
+      /* hijau untuk sukses */
+      word-break: break-word;
+    }
+
+    .upload-area.error .file-info {
+      color: #d93025;
+      /* merah untuk error */
+    }
   </style>
 </head>
+
 <body>
-  <h1>Upload Excel Metadata (21 Sheet)</h1>
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".xls,.xlsx" required />
-    <button type="submit">Generate Diagram</button>
-  </form>
+  <div class="container">
+    <div class="left-panel">
+      <h1>Overview Sistem</h1>
+      <div class="info-box">
+        <p>
+          Sistem ini dirancang untuk membantu dalam proses konversi metadata arsitektur SPBE ke dalam bentuk diagram
+          <strong>ArchiMate</strong>. Dengan memanfaatkan file Excel sebagai input, sistem akan secara otomatis
+          membangun model visual berdasarkan data yang telah diisi pengguna.
+        </p>
+
+        <h3>Panduan Penggunaan:</h3>
+        <ol>
+          <li>Unduh template Excel melalui tombol <strong>"Download Template"</strong>.</li>
+          <li>Lengkapi metadata sesuai struktur yang tersedia pada <strong>21 sheet</strong> di dalam file template.
+          </li>
+          <li>Pastikan seluruh data terisi dengan benar dan sesuai format yang ditentukan.</li>
+          <li>Unggah file Excel yang telah dilengkapi ke sistem melalui form upload.</li>
+          <li>Klik tombol <strong>"Generate Diagram"</strong> untuk memproses dan menghasilkan diagram ArchiMate secara
+            otomatis.</li>
+        </ol>
+
+        <p>
+          Pastikan untuk mengikuti urutan dan format pengisian agar hasil diagram sesuai dengan struktur arsitektur yang
+          diinginkan.
+        </p>
+      </div>
+
+    </div>
+    <div class="right-panel">
+      <div class="form-box">
+        <h1>Upload Excel Metadata (21 Sheet)</h1>
+        <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+          <label for="file-input" class="upload-area" id="drop-area">
+            <div>
+              <p>Submit file atau drag & drop file Excel ke sini</p>
+              <span id="file-status" class="file-info"></span>
+            </div>
+          </label>
+          <input type="file" name="file" id="file-input" accept=".xls,.xlsx" required />
+          <div class="buttons">
+            <button type="submit">Generate Diagram</button>
+            <a href="/download">
+              <button type="button">Download Template</button>
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </body>
+<script>
+  const dropArea = document.getElementById('drop-area');
+  const fileInput = document.getElementById('file-input');
+  const fileStatus = document.getElementById('file-status');
+
+  // Hapus event click (karena label dengan "for" sudah buka file manager)
+
+  dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropArea.classList.add('dragover');
+  });
+
+  dropArea.addEventListener('dragleave', () => {
+    dropArea.classList.remove('dragover');
+  });
+
+  dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropArea.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      validateAndDisplay(files[0]);
+      fileInput.files = files; // Tetap update input jika valid
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      validateAndDisplay(fileInput.files[0]);
+    }
+  });
+
+  function validateAndDisplay(file) {
+    const allowedTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+    const extension = file.name.split('.').pop().toLowerCase();
+
+    if (!allowedTypes.includes(file.type) || !['xls', 'xlsx'].includes(extension)) {
+      // Tampilkan error
+      dropArea.classList.add('error');
+      fileStatus.textContent = `❌ File tidak valid: "${file.name}". Harap upload file Excel (.xls atau .xlsx).`;
+      fileInput.value = ''; // Kosongkan input
+    } else {
+      // Tampilkan nama file sukses
+      dropArea.classList.remove('error');
+      fileStatus.textContent = `✅ File diterima: ${file.name}`;
+    }
+  }
+</script>
+
+
+
 </html>

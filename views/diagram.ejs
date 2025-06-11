@@ -1,30 +1,173 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>Hasil Diagram ArchiMate</title>
   <style>
-    body { font-family: sans-serif; padding: 2em; background: #f4f4f4; }
-    pre { background: #222; color: #0f0; padding: 1em; overflow-x: auto; }
-    .result { margin-top: 2em; }
-    img.diagram { border: 1px solid #ccc; background: #fff; padding: 10px; max-width: 100%; }
-    a.button { display: inline-block; margin-top: 1em; padding: 0.5em 1em; background: #007bff; color: white; text-decoration: none; border-radius: 5px; }
-    a.button:hover { background: #0056b3; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 2em;
+    }
+
+    .result {
+      background: white;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    img.diagram {
+      border: 1px solid #ccc;
+      background: #fff;
+      padding: 10px;
+      max-width: 100%;
+    }
+
+    .buttons {
+      margin-top: 1em;
+    }
+
+    a.button,
+    button.popup-button {
+      display: inline-block;
+      margin: 0.5em 0.5em 0 0;
+      padding: 0.5em 1em;
+      background: #e79950;
+      color: white;
+      text-decoration: none;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    a.button:hover,
+    button.popup-button:hover {
+      background: #50bce7;
+    }
+
+    /* === Popup Styles === */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup-content {
+      background: #ffffff;
+      color: #333;
+      padding: 0 1.5em 1em 1.5em;
+      border-radius: 10px;
+      width: 80%;
+      max-height: 80%;
+      overflow-y: auto;
+      position: relative;
+      font-family: 'Courier New', monospace;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .popup-content pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.95em;
+    }
+
+    .popup-buttons {
+      position: sticky;
+      top: 0;
+      right: 0;
+      background: #ffffff;
+      padding: 10px 10px 5px 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .popup-buttons button {
+      background-color: #eee;
+      color: #333;
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      font-size: 1.2em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.2s ease;
+    }
+
+    .popup-buttons button:hover {
+      background-color: #ccc;
+    }
   </style>
 </head>
-<body>
-  <h1>Diagram ArchiMate dari Metadata SPBE</h1>
 
+<body>
   <div class="result">
-    <h2>Generated PlantUML Syntax:</h2>
-    <pre><%= umlCode %></pre>
+    <h1>Diagram ArchiMate dari Metadata SPBE</h1>
 
     <h2>Diagram:</h2>
     <img class="diagram" src="https://www.plantuml.com/plantuml/svg/<%= encodedUml %>" alt="Diagram PlantUML" />
 
-    <a class="button" href="/">⬅ Kembali ke Upload</a>
-    <a class="button" href="https://www.plantuml.com/plantuml/png/<%= encodedUml %>" target="_blank">🖼 Download PNG</a>
-    <a class="button" href="https://www.plantuml.com/plantuml/svg/<%= encodedUml %>" target="_blank">🖼 Download SVG</a>
+    <div class="buttons">
+      <a class="button" href="/">⬅ Kembali</a>
+      <a class="button" href="https://www.plantuml.com/plantuml/svg/<%= encodedUml %>" target="_blank">🖼 Download
+        SVG</a>
+      <button class="popup-button" onclick="openPopup()">📜 Lihat PlantUML Syntax</button>
+    </div>
   </div>
+
+  <!-- Popup -->
+  <div class="popup-overlay" id="popup">
+    <div class="popup-content">
+      <div class="popup-buttons">
+        <button id="copy-button" onclick="copyToClipboard()" title="Copy">&#128203;</button>
+        <button onclick="closePopup()" title="Close">&#10006;</button>
+      </div>
+      <h2 style="margin-top:0;">PlantUML Syntax</h2>
+      <pre id="uml-code"><%= umlCode %></pre>
+    </div>
+  </div>
+  <script>
+    function openPopup() {
+      document.getElementById('popup').style.display = 'flex';
+    }
+
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
+    }
+
+    function copyToClipboard() {
+      const code = document.getElementById('uml-code').innerText;
+      const copyBtn = document.getElementById('copy-button');
+
+      navigator.clipboard.writeText(code).then(() => {
+        // Ubah ikon menjadi centang
+        copyBtn.innerHTML = '✔️';
+
+        // Kembalikan ke ikon clipboard setelah 5 detik
+        setTimeout(() => {
+          copyBtn.innerHTML = '&#128203;';
+        }, 5000);
+      }).catch(err => {
+        alert('❌ Gagal menyalin: ' + err);
+      });
+    }
+  </script>
+
 </body>
+
 </html>
