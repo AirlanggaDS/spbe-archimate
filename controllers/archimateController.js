@@ -380,9 +380,7 @@ exports.generateDiagram = (req, res) => {
       ...groups
     };
 
-    let horizontal = false;
-    if (req.query.horizontal) horizontal = true;
-    const umlCode = generatePlantUML(elements, relations, horizontal);
+    const umlCode = generatePlantUML(elements, relations);
 
     // 3. Encode syntax untuk render diagram
     const encodedUml = plantumlEncoder.encode(umlCode);

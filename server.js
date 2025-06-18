@@ -11,6 +11,7 @@ app.use(express.static('public'));
 app.use('/', route);
 
 const PORT = 3000;
+app.use('/storage', express.static(path.join(__dirname, 'storage')));
 
 process.on('uncaughtException', (error) => {
   console.error('Uncaught exception:', error);
