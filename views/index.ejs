@@ -156,11 +156,12 @@
       justify-content: center;
       align-items: center;
       z-index: 999;
+      overflow: auto;
     }
 
     .popup img {
-      max-width: 90vw;
-      max-height: 90vh;
+      max-height: 100%;
+      max-width: none;
       border-radius: 8px;
       box-shadow: 0 0 10px #000;
       transition: transform 0.3s ease;
@@ -210,11 +211,19 @@
         <h3>Panduan Pengisian Metadata:</h3>
         <ul>
           <li>Gunakan template Excel resmi dari sistem.</li>
-          <li>Setiap sheet memiliki atribut wajib yang ditandai dengan kolom <strong>berwarna abu-abu</strong>. Pastikan
-            kolom tersebut diisi dengan benar.</li>
-          <li>Relasi antar metadata ditulis pada kolom <strong>'ID Metadata Terkait'</strong> dengan format
-            <code>ID1,ID2,ID3,...</code>.
+          <li>Setiap sheet memiliki atribut wajib yang ditandai dengan kolom
+            <span
+              style="font-weight: bold; background-color: yellow; padding: 2px 4px; border: 1px solid #cccc00;">kuning</span>.
+            Pastikan kolom tersebut diisi dengan benar.
           </li>
+          <li>Ada juga atribut opsional yang ditandai dengan kolom
+            <span
+              style="font-weight: bold; background-color: orange; padding: 2px 4px; border: 1px solid #cc6600;">jingga</span>.
+            Kolom ini boleh diisi atau tidak. Jika diisi, nilainya akan ditampilkan di diagram.
+          </li>
+
+          <li>Relasi antar metadata ditulis pada kolom <strong>'ID Metadata Terkait'</strong> dan dipisahkan dengan
+            tanda koma (comma). Contohnya: <code>ID01,ID02,ID03</code>.</li>
           <li>Relasi mengikuti aturan dalam <strong>Surat Edaran Menteri PAN-RB No. 18 Tahun 2022</strong>, dan telah
             disesuaikan serta diverifikasi oleh pakar untuk pemetaan ke ArchiMate.</li>
         </ul>
