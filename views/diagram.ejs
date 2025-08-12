@@ -18,12 +18,29 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    img.diagram {
+    .diagram-container {
+      width: 100%;
+      height: 600px;
+      overflow: hidden;
       border: 1px solid #ccc;
       background: #fff;
-      padding: 10px;
-      max-width: 100%;
+      position: relative;
+      cursor: grab;
     }
+
+    .diagram-container:active {
+      cursor: grabbing;
+    }
+
+    .diagram-object {
+      transform-origin: top left;
+      transform: scale(1);
+      display: block;
+      pointer-events: none;
+      /* supaya drag event ke container, bukan ke object */
+      user-select: none;
+    }
+
 
     .buttons {
       margin-top: 1em;
@@ -120,7 +137,10 @@
     <h1>Diagram ArchiMate dari Metadata SPBE</h1>
 
     <h2>Diagram:</h2>
-    <img class="diagram" src="https://www.plantuml.com/plantuml/svg/<%= encodedUml %>" alt="Diagram PlantUML" />
+    <div class="diagram-container" id="diagramContainer">
+      <object class="diagram-object" type="image/svg+xml"
+        data="https://www.plantuml.com/plantuml/svg/<%= encodedUml %>"></object>
+    </div>
 
     <div class="buttons">
       <a class="button" href="/">⬅ Kembali</a>
@@ -165,6 +185,74 @@
       }).catch(err => {
         alert('❌ Gagal menyalin: ' + err);
       });
+    }
+
+    const container = document.getElementById('diagramContainer');
+    const object = container.querySelector('.diagram-object');
+
+    let scale = 1;
+    let posX = 0;
+    let posY = 0;
+
+    function updateTransform() {
+      object.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+    }
+
+    // Zoom dan scroll natural
+    container.addEventListener('wheel', function (e) {
+      // Prevent default behavior (scroll page)
+      e.preventDefault();
+
+      const zoomSpeed = 0.1;
+      const panSpeed = 30;
+
+      if (e.ctrlKey) {
+        // Zoom
+        const delta = e.deltaY > 0 ? -zoomSpeed : zoomSpeed;
+        const oldScale = scale;
+        scale = Math.min(Math.max(scale + delta, 0.2), 5);
+
+        // Zoom terfokus di posisi kursor
+        const rect = container.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left - posX;
+        const offsetY = e.clientY - rect.top - posY;
+
+        posX -= offsetX * (scale - oldScale) / scale;
+        posY -= offsetY * (scale - oldScale) / scale;
+
+      } else if (e.shiftKey) {
+        // Scroll horizontal (Shift + Scroll)
+        posX -= e.deltaY > 0 ? panSpeed : -panSpeed;
+      } else if (e.altKey) {
+        // Scroll vertical alternatif (Alt + Scroll)
+        posY -= e.deltaY > 0 ? panSpeed : -panSpeed;
+      } else {
+        // Default vertical scroll
+        posY -= e.deltaY > 0 ? panSpeed : -panSpeed;
+      }
+
+      updateTransform();
+    }, { passive: false });
+
+
+    container.addEventListener('mousedown', function (e) {
+      isDragging = true;
+      startX = e.clientX - posX;
+      startY = e.clientY - posY;
+    });
+
+    container.addEventListener('mousemove', function (e) {
+      if (!isDragging) return;
+      posX = e.clientX - startX;
+      posY = e.clientY - startY;
+      updateTransform();
+    });
+
+    container.addEventListener('mouseup', () => isDragging = false);
+    container.addEventListener('mouseleave', () => isDragging = false);
+
+    function updateTransform() {
+      object.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
     }
   </script>
 
