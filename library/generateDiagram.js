@@ -1,11 +1,13 @@
-const { spriteElementMap, hierarchyOrder, layerMap, relMacroMap, labelMap } = require('./mapping');
+const { spriteElementMap, hierarchyOrder, layerMap, relMacroMap, labelMap, platformPosition } = require('./mapping');
 
 function generatePlantUML(elements, relations) {
   const lines = [];
   lines.push('@startuml');
-  lines.push('skinparam nodesep 130');
-  lines.push('skinparam ranksep 130');
+  lines.push('skinparam nodesep 110');
+  lines.push('skinparam ranksep 110');
   lines.push('skinparam linetype ortho');
+  // lines.push('hide stereotype');
+
   lines.push('!include <archimate/Archimate>');
 
   const getOrderIndex = (type) => {
@@ -20,16 +22,18 @@ function generatePlantUML(elements, relations) {
   lines.push('');
 
   function sanitizeId(val) {
-    if (typeof val === 'string') return val.replace(/\s+/g, '_');
-    if (val?.id) return String(val.id).replace(/\s+/g, '_');
-    return String(val).replace(/\s+/g, '_');
+    const raw = typeof val === 'string' ? val
+      : (val?.id ? String(val.id)
+        : String(val));
+    // Ganti semua karakter non-alfanumerik (kecuali underscore) dengan _
+    return raw.replace(/[^a-zA-Z0-9_]/g, '_');
   }
 
   // Urutkan semua elemen regular sesuai hierarchyOrder
   for (const type of hierarchyOrder) {
     const groupId = type.replace(/\s+/g, '_');
     const matchingElements = type.startsWith('Group')
-      ? elements[type] || []
+      ? elements[type]?.elements || []
       : (elements.regular || []).filter(el => el.type === type);
 
     if (matchingElements.length > 0) {
@@ -71,7 +75,7 @@ function generatePlantUML(elements, relations) {
     for (const groupKey of Object.keys(elements)) {
       if (groupKey === 'regular') continue;
       const group = elements[groupKey];
-      for (const el of group) {
+      for (const el of group?.elements) {
         if (el.id === id) {
           return el.type || groupKey; // fallback ke nama grup jika type kosong
         }
@@ -83,7 +87,6 @@ function generatePlantUML(elements, relations) {
 
 
   for (const rel of relations) {
-    // Dapatkan source dan target berdasarkan role di rel.ids
     const sourceObj = rel.ids.find(e => e.role === 'source') || rel.ids[0];
     const targetObj = rel.ids.find(e => e.role === 'target') || rel.ids[1];
 
@@ -99,14 +102,37 @@ function generatePlantUML(elements, relations) {
     const toOrder = getOrderIndex(toType);
 
     let direction = '';
-    if (sourceObj.metadata === 'Fasilitas Komputasi' && (targetObj.metadata === 'Group Sistem Integrasi' || targetObj.metadata === 'Group Platform')) {
+
+    // 🔧 Gunakan metadata karena platformPosition pakai nama entitas, bukan tipe elemen
+    const fromMeta = sourceObj.metadata;
+    const toMeta = targetObj.metadata;
+
+    if (platformPosition[fromMeta] && platformPosition[toMeta]) {
+      const fromPos = platformPosition[fromMeta];
+      const toPos = platformPosition[toMeta];
+
+      const dx = toPos.x - fromPos.x;
+      const dy = toPos.y - fromPos.y;
+
+      if (Math.abs(dx) >= Math.abs(dy)) {
+        direction = dx > 0 ? 'Right' : 'Left';
+      } else {
+        direction = dy > 0 ? 'Down' : 'Up';
+      }
+
+    } else if (fromMeta === 'Fasilitas Komputasi' &&
+      (toMeta === 'Group Sistem Integrasi' || toMeta === 'Group Platform')) {
       direction = 'Right';
-    } else if (sourceObj.metadata === 'Group Keamanan') {
+
+    } else if (fromMeta === 'Group Keamanan') {
       direction = 'Up';
+
     } else if (fromOrder < toOrder) {
       direction = 'Down';
+
     } else if (fromOrder > toOrder) {
       direction = 'Up';
+
     } else {
       direction = 'Down';
     }
@@ -114,7 +140,6 @@ function generatePlantUML(elements, relations) {
     const macro = `${macroBase}_${direction}`;
     lines.push(`${macro}(${from}, ${to}, "${relType}")`);
   }
-
 
   lines.push('');
   lines.push('legend left');
