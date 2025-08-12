@@ -36,16 +36,17 @@ const IdsRelation = [
     { types: ['Perangkat Keras Keamanan', 'Perangkat Lunak Platform'], source: 'Perangkat Keras Keamanan', target: 'Perangkat Lunak Platform', relation: 'Association' },
     { types: ['Perangkat Keras Keamanan', 'Perangkat Keras Server'], source: 'Perangkat Keras Keamanan', target: 'Perangkat Keras Server', relation: 'Association' },
     { types: ['Perangkat Keras Keamanan', 'Perangkat Keras Jaringan'], source: 'Perangkat Keras Keamanan', target: 'Perangkat Keras Jaringan', relation: 'Association' },
-    { types: ['Perangkat Keras Keamanan', 'Perangkat Keras Media Penyimpanan'], source: 'Perangkat Keras Keamanan', target: 'Perangkat Keras Media Penyimpanan', relation: 'Association' },
+    { types: ['Perangkat Keras Keamanan', 'Perangkat Keras Media Storage'], source: 'Perangkat Keras Keamanan', target: 'Perangkat Keras Media Storage', relation: 'Association' },
     { types: ['Perangkat Keras Jaringan', 'Perangkat Lunak Platform'], source: 'Perangkat Keras Jaringan', target: 'Perangkat Lunak Platform', relation: 'Association' },
     { types: ['Perangkat Keras Jaringan', 'Perangkat Keras Server'], source: 'Perangkat Keras Jaringan', target: 'Perangkat Keras Server', relation: 'Association' },
     { types: ['Perangkat Keras Jaringan', 'Perangkat Keras Periferal'], source: 'Perangkat Keras Jaringan', target: 'Perangkat Keras Periferal', relation: 'Association' },
-    { types: ['Perangkat Keras Jaringan', 'Perangkat Keras Media Penyimpanan'], source: 'Perangkat Keras Jaringan', target: 'Perangkat Keras Media Penyimpanan', relation: 'Association' },
+    { types: ['Perangkat Keras Jaringan', 'Perangkat Keras Media Storage'], source: 'Perangkat Keras Jaringan', target: 'Perangkat Keras Media Storage', relation: 'Association' },
     { types: ['Perangkat Keras Periferal', 'Perangkat Lunak Platform'], source: 'Perangkat Keras Periferal', target: 'Perangkat Lunak Platform', relation: 'Association' },
     { types: ['Perangkat Keras Periferal', 'Perangkat Keras Server'], source: 'Perangkat Keras Periferal', target: 'Perangkat Keras Server', relation: 'Association' },
-    { types: ['Perangkat Keras Periferal', 'Perangkat Keras Media Penyimpanan'], source: 'Perangkat Keras Periferal', target: 'Perangkat Keras Media Penyimpanan', relation: 'Association' },
-    { types: ['Perangkat Keras Media Penyimpanan', 'Perangkat Lunak Platform'], source: 'Perangkat Keras Media Penyimpanan', target: 'Perangkat Lunak Platform', relation: 'Association' },
-    { types: ['Perangkat Keras Media Penyimpanan', 'Perangkat Keras Server'], source: 'Perangkat Keras Media Penyimpanan', target: 'Perangkat Keras Server', relation: 'Association' }
+    { types: ['Perangkat Keras Periferal', 'Perangkat Keras Media Storage'], source: 'Perangkat Keras Periferal', target: 'Perangkat Keras Media Storage', relation: 'Association' },
+    { types: ['Perangkat Keras Media Storage', 'Perangkat Lunak Platform'], source: 'Perangkat Keras Media Storage', target: 'Perangkat Lunak Platform', relation: 'Serving' },
+    { types: ['Perangkat Keras Media Storage', 'Perangkat Keras Server'], source: 'Perangkat Keras Media Storage', target: 'Perangkat Keras Server', relation: 'Access' },
+    { types: ['Sistem Penghubung Layanan', 'Jaringan Intra'], source: 'Jaringan Intra', target: 'Sistem Penghubung Layanan', relation: 'Serving' }
 ];
 
 const specialRelation = [
@@ -60,12 +61,6 @@ const specialRelation = [
     { types: ['Group Keamanan', 'Aplikasi'], source: 'Group Keamanan', target: 'Aplikasi', relation: 'Realization' },
     { types: ['Group Keamanan', 'Group Sistem Integrasi'], source: 'Group Keamanan', target: 'Group Sistem Integrasi', relation: 'Realization' }
 ];
-
-const groups = {
-    "Group Platform": [],
-    "Group Sistem Integrasi": [],
-    "Group Keamanan": []
-};
 
 const groupTypes = {
     "Group Platform": [
@@ -120,6 +115,18 @@ const hierarchyOrder = [
     'Facility',
     'Group Keamanan'
 ];
+
+const platformPosition = {
+    'Komputasi Awan': { x: 0, y: 0 }, // A1
+    'Perangkat Keras Jaringan': { x: 0, y: 1 }, // A2
+    'Perangkat Keras Keamanan': { x: 0, y: 2 }, // A3
+    'Perangkat Lunak Platform': { x: 1, y: 0 }, // B1
+    'Perangkat Keras Server': { x: 1, y: 2 }, // B3
+    'Perangkat Keras Media Storage': { x: 2, y: 0 }, // C1
+    'Perangkat Keras Periferal': { x: 2, y: 2 }, // C3
+};
+
+
 
 const layerMap = {
     'Business Process': 'Business',
@@ -176,4 +183,4 @@ const labelMap = {
     'Requirement': 'Requirement',
 };
 
-module.exports = { archimateMap, IdsRelation, specialRelation, groups, groupTypes, spriteElementMap, hierarchyOrder, layerMap, relMacroMap, labelMap };
+module.exports = { archimateMap, IdsRelation, specialRelation, groupTypes, spriteElementMap, hierarchyOrder, layerMap, relMacroMap, labelMap, platformPosition };
