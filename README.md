@@ -1,4 +1,4 @@
-# Automatic ArchiMate Diagram Generator
+# Automatic ArchiMate Diagram Generator For SPBE Architecture
 
 This project is a research prototype that generates **ArchiMate diagrams automatically** using [PlantUML](https://plantuml.com/) as the rendering engine.  
 The input comes from an **Excel file containing SPBE architecture metadata**, which is processed by the system to produce ArchiMate models in diagram form.
